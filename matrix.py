@@ -9,6 +9,8 @@ class Matrix:
     def makeRREF(self, pivotRow, pivotCol):
         if pivotRow >= self.rows:
             return self.makeRREF(0, pivotCol+1)
+        if pivotCol >= self.cols:
+            return
         digit = int(self.matrix[pivotRow][pivotCol])
         if digit != 0:
             if digit != 1:
@@ -17,18 +19,34 @@ class Matrix:
                     self.matrix[pivotRow][counter] = Fraction(int(c), digit)
                     counter += 1
 
-            if pivotRow >= pivotCol:
-                counter = 0
-                good = False
-                while counter <= pivotRow and good == False:
-                    if self.foundPivot[counter] == False:
-                        tempRow = self.matrix[pivotRow]
-                        self.matrix[pivotRow] = self.matrix[counter]
-                        self.matrix[counter] = tempRow
-                        self.foundPivot[counter] = True
-                        good = True
-                    counter += 1
-
+            counter = 0
+            good = False
+            while counter <= pivotRow and good == False:
+                if self.foundPivot[counter] == False:
+                    tempRow = self.matrix[pivotRow]
+                    self.matrix[pivotRow] = self.matrix[counter]
+                    self.matrix[counter] = tempRow
+                    self.foundPivot[counter] = True
+                    good = True
+                    pivotRow = counter
+                counter += 1
+            
+            counter = 0
+            while counter < self.rows:
+                num = int(self.matrix[counter][pivotCol])
+                if num != 0 and counter != pivotRow:
+                    addRow = []
+                    for c in self.matrix[pivotRow]:
+                        addRow.append(-num*int(c))
+                    colCounter = 0
+                    result = []
+                    for c in addRow:
+                        result.append(c +
+                                int(self.matrix[counter][colCounter]))
+                        colCounter += 1
+                    self.matrix[counter] = result
+                counter += 1
+            return self.makeRREF(pivotRow+1, pivotCol+1)
         else:
             return self.makeRREF(pivotRow+1, pivotCol)
 
