@@ -6,15 +6,18 @@ from fractions import Fraction
 class Matrix:
     """A class that has a matrix representation to find the RREF and Det."""
     
-    def makeRREF(self, pivotRow, pivotCol):
+    def makeRREF(self, pivotRow=0, pivotCol=0):
         if pivotRow >= self.rows:
             return self.makeRREF(0, pivotCol+1)
         if pivotCol >= self.cols:
+            return
+        if pivotRow >= self.rows and pivotCol >= self.cols:
             return
         digit = int(self.matrix[pivotRow][pivotCol])
         if digit != 0:
             if digit != 1:
                 counter = 0
+                self.registry = self.registry * digit
                 for c in self.matrix[pivotRow]:
                     self.matrix[pivotRow][counter] = Fraction(int(c), digit)
                     counter += 1
@@ -26,6 +29,8 @@ class Matrix:
                     tempRow = self.matrix[pivotRow]
                     self.matrix[pivotRow] = self.matrix[counter]
                     self.matrix[counter] = tempRow
+                    if counter != pivotRow:
+                        self.registry = self.registry * -1
                     self.foundPivot[counter] = True
                     good = True
                     pivotRow = counter
@@ -46,10 +51,24 @@ class Matrix:
                         colCounter += 1
                     self.matrix[counter] = result
                 counter += 1
-            return self.makeRREF(pivotRow+1, pivotCol+1)
+            self.makeRREF(pivotRow+1, pivotCol+1)
         else:
-            return self.makeRREF(pivotRow+1, pivotCol)
+            self.makeRREF(pivotRow+1, pivotCol)
 
+    def createDet(self):
+        if self.rows != self.cols:
+            print "Cannot determine a Det for this matrix."
+            return
+        else:
+            counter = 0
+            while counter < self.rows:
+                self.det = self.det * int(self.matrix[counter][counter])
+                counter += 1
+        self.det = self.det * self.registry
+    
+    def displayDet(self):
+        print "The Det is ", self.det
+    
     def createMatrix(self, matrixRep):
         matrix = matrixRep.split(', ')
         newMatrix = []
@@ -75,7 +94,7 @@ class Matrix:
         self.cols = len(self.matrix[0]);
         self.foundPivot = {}
         self.populatePivot()
-        self.det = 0;
+        self.det = 1;
         self.registry = 1;
 
 
@@ -85,5 +104,7 @@ if __name__ == "__main__":
     print 'Enter in your matrix: '
     matrix = Matrix(raw_input());
     matrix.displayMatrix()
-    matrix.makeRREF(0, 0)
+    matrix.makeRREF()
     matrix.displayMatrix()
+    matrix.createDet()
+    matrix.displayDet()
