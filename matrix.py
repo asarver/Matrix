@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import division
-from fractions import Fraction
+from fractions import *
 
 class Matrix:
     """A class that has a matrix representation to find the RREF and Det."""
@@ -11,15 +11,15 @@ class Matrix:
             return self.makeRREF(0, pivotCol+1)
         if pivotCol >= self.cols:
             return
-        if pivotRow >= self.rows and pivotCol >= self.cols:
-            return
-        digit = int(self.matrix[pivotRow][pivotCol])
+        #if pivotRow >= self.rows and pivotCol >= self.cols:
+         #   return
+        digit = Fraction(self.matrix[pivotRow][pivotCol])
         if digit != 0:
             if digit != 1:
                 counter = 0
-                self.registry = self.registry * digit
+                self.registry = Fraction(self.registry) * Fraction(digit)
                 for c in self.matrix[pivotRow]:
-                    self.matrix[pivotRow][counter] = Fraction(int(c), digit)
+                    self.matrix[pivotRow][counter] = Fraction(c) / Fraction(digit)
                     counter += 1
 
             counter = 0
@@ -30,7 +30,7 @@ class Matrix:
                     self.matrix[pivotRow] = self.matrix[counter]
                     self.matrix[counter] = tempRow
                     if counter != pivotRow:
-                        self.registry = self.registry * -1
+                        self.registry = Fraction(self.registry) * -1
                     self.foundPivot[counter] = True
                     good = True
                     pivotRow = counter
@@ -38,16 +38,16 @@ class Matrix:
             
             counter = 0
             while counter < self.rows:
-                num = int(self.matrix[counter][pivotCol])
+                num = Fraction(self.matrix[counter][pivotCol])
                 if num != 0 and counter != pivotRow:
                     addRow = []
                     for c in self.matrix[pivotRow]:
-                        addRow.append(-num*int(c))
+                        addRow.append(Fraction(-num)*Fraction(c))
                     colCounter = 0
                     result = []
                     for c in addRow:
-                        result.append(c +
-                                int(self.matrix[counter][colCounter]))
+                        result.append(Fraction(c +
+                                Fraction(self.matrix[counter][colCounter])))
                         colCounter += 1
                     self.matrix[counter] = result
                 counter += 1
@@ -62,19 +62,16 @@ class Matrix:
         else:
             counter = 0
             while counter < self.rows:
-                self.det = self.det * int(self.matrix[counter][counter])
+                self.det = Fraction(self.det) * Fraction(self.matrix[counter][counter])
                 counter += 1
-        self.det = self.det * self.registry
+        self.det = Fraction(self.det) * Fraction(self.registry)
     
     def displayDet(self):
         print "The Det is ", self.det
     
     def createMatrix(self, matrixRep):
         matrix = matrixRep.split(', ')
-        newMatrix = []
-        for r in matrix:
-            newMatrix.append(r.split(' '))
-        return newMatrix
+        return [r.split(' ') for r in matrix]
     
     def displayMatrix(self):
         for r in self.matrix:
@@ -94,8 +91,8 @@ class Matrix:
         self.cols = len(self.matrix[0]);
         self.foundPivot = {}
         self.populatePivot()
-        self.det = 1;
-        self.registry = 1;
+        self.det = Fraction(1);
+        self.registry = Fraction(1);
 
 
 if __name__ == "__main__":
